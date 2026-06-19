@@ -1,0 +1,51 @@
+class Solution {
+public:
+    bool f(int idx, vector<int>& nums, int target, vector<vector<int>>& dp){
+        if(target == 0) return true;
+        if(idx == 0){
+            return target == 0 || nums[0] == target;
+        }
+        if(dp[idx][target] != -1) return dp[idx][target];
+        bool take = false;
+        if(nums[idx] <= target){
+            take = f(idx - 1 , nums, target - nums[idx], dp);
+        }
+
+        bool notTake = f(idx - 1, nums, target, dp);
+
+        return dp[idx][target]  = take || notTake;
+    }
+
+    bool canPartition(vector<int>& nums) {
+        int n = nums.size();
+        int totalSum = 0 ;
+        for(int num :  nums){
+            totalSum += num;
+        }
+
+        if(totalSum % 2 == 1) return false;
+        int target = totalSum / 2;
+
+        // vector<vector<int>> dp(n , vector<int>(target + 1, -1));
+        // return f(n-1, nums, target, dp);
+
+        vector<vector<int>> dp(n , vector<int>(target + 1, 0));
+        for(int i = 0; i < n; i++)
+            dp[i][0] = true;
+
+        if(nums[0] <= target)
+            dp[0][nums[0]] = true;
+            
+        for(int i = 1 ; i < n ; ++i){
+            for(int j = 0 ; j <= target ; ++j){
+                bool take = false;
+                if(nums[i] <= j){
+                    take = dp[i-1][j - nums[i]];
+                }
+                bool notTake = dp[i-1][j];
+                dp[i][j] = take || notTake;
+            }
+        }
+        return dp[n-1][target];
+    }
+};
